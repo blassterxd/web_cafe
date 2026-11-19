@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Меню напитков</h1>
+<div class="cards">
+    {% for slug, drink in drinks.items() %}
+    <article class="card">
+        <h2><a href="{{ url_for('drink_detail', slug=slug) }}">{{ drink.name }}</a></h2>
+        <p>{{ drink.volume }} мл</p>
+        <strong>{{ drink.price }} ₽</strong>
+    </article>
+    {% endfor %}
+</div>
+{% endblock %}

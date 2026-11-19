@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Калькулятор заказа · Кофейня «Перемена»</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 32px 16px;
+      background: #f5f0e8;
+      color: #30251d;
+      font: 1rem/1.5 "Roboto", system-ui, sans-serif;
+    }
+    main {
+      max-width: 30rem;
+      margin: 2rem auto;
+      padding: clamp(1.25rem, 5vw, 2.5rem);
+      border: 1px solid #ded4c8;
+      border-radius: 1rem;
+      background: #fffdf9;
+    }
+    h1 { font-size: clamp(1.75rem, 6vw, 2.4rem); line-height: 1.1; margin: .4rem 0 1.8rem; }
+    p { margin: 0; }
+    form { display: grid; gap: 1.2rem; }
+    label { display: grid; gap: .35rem; font-weight: 600; }
+    select, input, button { font: inherit; }
+    select, input[type="number"] {
+      width: 100%;
+      padding: .65rem .75rem;
+      border: 1px solid #817568;
+      border-radius: .4rem;
+      color: inherit;
+      background: white;
+    }
+    .extra { display: flex; align-items: center; gap: .65rem; }
+    .extra input { width: 1.2rem; height: 1.2rem; accent-color: #285246; }
+    button {
+      padding: .75rem;
+      border: 0;
+      border-radius: .4rem;
+      background: #285246;
+      color: white;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    :focus-visible { outline: 3px solid #9b4c23; outline-offset: 3px; }
+    output:not(:empty) { display: block; margin-top: 1.4rem; font-size: 1.2rem; font-weight: 700; }
+  </style>
+</head>
+<body>
+  <main>
+    <p>Кофейня «Перемена»</p>
+    <h1>Калькулятор заказа</h1>
+    <form id="order" action="/api/price" method="get">
+      <label>Напиток
+        <select name="drink">
+          <option value="cappuccino">Капучино · 180 ₽</option>
+          <option value="cocoa">Какао · 150 ₽</option>
+        </select>
+      </label>
+      <label>Количество чашек (1–10)
+        <input name="quantity" type="number" min="1" max="10" step="1" value="1" required>
+      </label>
+      <label class="extra">
+        <input name="oat" type="checkbox" value="true">
+        Овсяное молоко (+30 ₽ за чашку)
+      </label>
+      <button type="submit" disabled>Рассчитать</button>
+      <noscript><p>Чтобы рассчитать заказ, включите JavaScript в браузере.</p></noscript>
+    </form>
+    <output id="receipt" aria-live="polite"></output>
+  </main>
+  <script>
+    const form = document.querySelector("#order");
+    const receipt = document.querySelector("#receipt");
+    const button = form.querySelector("button");
+    let orderVersion = 0;
+
+    form.addEventListener("input", () => {
+      orderVersion++;
+      receipt.textContent = "";
+      button.disabled = false;
+    });
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const requestVersion = ++orderVersion;
+      const params = new URLSearchParams(new FormData(form));
+      button.disabled = true;
+      let message;
+      try {
+        const response = await fetch(form.action + "?" + params);
+        if (response.status === 422) {
+          message = "Выберите напиток из списка и укажите количество чашек — целое число от 1 до 10.";
+        } else if (response.ok) {
+          const order = await response.json();
+          message = "Итого: " + order.total + " ₽";
+        } else {
+          message = "Не удалось рассчитать стоимость заказа. Попробуйте ещё раз.";
+        }
+      } catch {
+        message = "Нет связи с сервером. Попробуйте ещё раз.";
+      }
+      if (requestVersion === orderVersion) {
+        receipt.textContent = message;
+        button.disabled = false;
+      }
+    });
+    button.disabled = false;
+  </script>
+</body>
+</html>

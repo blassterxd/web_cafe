@@ -1,0 +1,10 @@
+services:
+  vitrina:
+    build: ./vitrina
+    ports:
+      - "${BIND_IP:-127.0.0.1}:${PORT1:-5050}:8000"
+
+  kalkulyator:
+    build: ./kalkulyator
+    ports:
+      - "${BIND_IP:-127.0.0.1}:${PORT2:-8050}:8000"

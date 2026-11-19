@@ -1,0 +1,44 @@
+:root {
+    font-family: system-ui, sans-serif;
+    color: #342820;
+    background: #faf6ed;
+    line-height: 1.5;
+}
+
+body {
+    max-width: 52rem;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+header {
+    padding: 1rem 0;
+    border-bottom: 2px solid #94724b;
+}
+
+a {
+    color: #744222;
+    text-underline-offset: 0.2em;
+}
+
+a:focus-visible {
+    outline: 3px solid #8e5121;
+    outline-offset: 3px;
+}
+
+.cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+    gap: 1rem;
+}
+
+.card {
+    padding: 1rem 1.25rem;
+    background: white;
+    border: 1px solid #cfbda8;
+    border-radius: 0.75rem;
+}
+
+.card h2 {
+    margin: 0;
+}
